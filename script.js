@@ -44,8 +44,6 @@ function update() {
     )
     .find('input');
 
-  console.log(new Date(data));
-
   input.val(
     input.attr('type') === 'date'
     ? convertDate(new Date(data))
@@ -63,10 +61,9 @@ function convertDate(dateVal) {
       +' '+date.getFullYear();
   }
   else {
-    newDate = String(dateVal.getFullYear()
-      +'-'+String(dateVal.getMonth()+1).padStart(2, '0')
-      +'-'+dateVal.getDate()).padStart(2, '0')
-
+    newDate = dateVal.getFullYear()
+    +'-'+String(dateVal.getMonth()+1).padStart(2, '0')
+    +'-'+String(dateVal.getDate()).padStart(2, '0');
   }
 
   return newDate;
