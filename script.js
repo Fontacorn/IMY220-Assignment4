@@ -1,62 +1,98 @@
+const months =  ['January','February','March','April','May','June', 'July',
+                'August', 'September', 'October', 'November', 'December']
+
 $('.btn').each(function (index, btn) {
-  $(btn).on('click', () => {
-    // Temp variables
-    const parent = $(btn).parent();
-    const dataEl = parent.find('span');
-
-    // Hide/Show field and name
-    $(btn).toggle();
-    parent.find('b').toggle();
-    dataEl.toggle();
-
-
-    const input =
-      parent.append(
-        $('<div></div>', {
-          class: 'row'
-        })
-        .append([
-          $('<div></div>', {
-            class: 'col-8'
-          })
-          .append(
-            $('<input>', {
-              type: $(this).attr('data-type'),
-              class: 'w-100'
-            })
-          ),
-          $('<div></div>', {
-            class: 'col-4'
-          })
-          .append(
-            $('<button></button>', {
-              class: 'btn btn-dark pull-right',
-              html: 'Update'
-            })
-            .on('click', function() {
-              save(parent, dataEl, $(btn));
-              parent.find('b').toggle();
-              dataEl.toggle();
-              $(btn).toggle();
-              parent.find('.row').remove();
-            })
-          )
-        ])
-      )
-      .find('input');
-
-    input.val(dataEl.html());
-
-  });
+  $(btn).on('click', update)
 });
 
-function save(parent, dataEl, button) {
-  const inputVal = parent
-                    .find('.col-8')
-                    .remove()
-                    .find('input')
-                    .val();
+function update() {
+  // Temp variables
+  const parent = $(this).parent();
+  const data = parent.find('span').html();
+  const name = parent.find('b').html();
 
-  dataEl.html(inputVal);
+  parent.empty();
 
+  const input =
+    parent.append(
+      $('<div></div>', {
+        class: 'row'
+      })
+      .append([
+        $('<div></div>', {
+          class: 'col-8'
+        })
+        .append(
+          $('<input>', {
+            type: parent.attr('data-type'),
+            class: 'w-100'
+          })
+        ),
+        $('<div></div>', {
+          class: 'col-4'
+        })
+        .append(
+          $('<button></button>', {
+            class: 'btn btn-dark pull-right',
+            html: 'Update'
+          })
+          .on('click', function() {
+            save(parent, name);
+          })
+        )
+      ])
+    )
+    .find('input');
+
+  console.log(new Date(data));
+
+  input.val(
+    input.attr('type') === 'date'
+    ? convertDate(new Date(data))
+    : data
+  );
+}
+
+function convertDate(dateVal) {
+  let newDate = '';
+
+  if (typeof(dateVal) === 'string') {
+    const date = new Date(dateVal);
+    newDate = String(date.getDate()).padStart(2,'0')
+      +' '+months[date.getMonth()]
+      +' '+date.getFullYear();
+  }
+  else {
+    newDate = String(dateVal.getFullYear()
+      +'-'+String(dateVal.getMonth()+1).padStart(2, '0')
+      +'-'+dateVal.getDate()).padStart(2, '0')
+
+  }
+
+  return newDate;
+}
+
+function save(parent, name) {
+  const input = parent.find('input');
+
+  const inputVal = input.attr('type') === 'date'
+                    ? convertDate(input.val())
+                    : input.val();
+
+  parent.empty();
+
+  parent.append([
+    $('<b></b>', {
+      html: name+' '
+    }),
+    $('<span></span>', {
+      html: inputVal
+    }),
+    $('<button></button>',
+    {
+      class: 'btn btn-dark pull-right',
+      html: 'Edit'
+    })
+    .on('click', update)
+  ]);
 }
